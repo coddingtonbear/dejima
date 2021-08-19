@@ -1,6 +1,6 @@
-========
-Overview
-========
+========================
+Boox Annotations to Anki
+========================
 
 .. start-badges
 
@@ -34,8 +34,6 @@ Overview
     :alt: Commits since latest release
     :target: https://github.com/coddingtonbear/boox-annotations-to-anki/compare/v0.1.0...master
 
-
-
 .. end-badges
 
 Create cards in Anki from your Onyx Boox annotations.
@@ -54,38 +52,19 @@ You can also install the in-development version with::
     pip install https://github.com/coddingtonbear/boox-annotations-to-anki/archive/master.zip
 
 
+Requirements
+============
+
+- AnkiConnect: https://ankiweb.net/shared/info/2055492159
+- Within Anki, you should have a "Note Type" named (by default, named "Foreign Import") having the following fields:
+  - ``Front``
+  - ``Back``
+  - ``ForeignKey``
+
 Documentation
 =============
 
-
-To use the project:
-
-.. code-block:: python
-
-    import boox_annotations_to_anki
-    boox_annotations_to_anki.longest()
+You can import your cards into Anki by running::
 
 
-Development
-===========
-
-To run all the tests run::
-
-    tox
-
-Note, to combine the coverage data from all the tox environments run:
-
-.. list-table::
-    :widths: 10 90
-    :stub-columns: 1
-
-    - - Windows
-      - ::
-
-            set PYTEST_ADDOPTS=--cov-append
-            tox
-
-    - - Other
-      - ::
-
-            PYTEST_ADDOPTS=--cov-append tox
+    boox-annotations-to-anki MY_DECK_NAME --input=/path/to/boox/annotations.txt
