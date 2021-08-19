@@ -23,7 +23,7 @@ def read(*names, **kwargs):
 
 setup(
     name='boox-annotations-to-anki',
-    version='0.1.0',
+    version='0.1.1',
     license='MIT',
     description='Create cards in Anki from your Onyx Boox annotations.',
     long_description='%s\n%s' % (
