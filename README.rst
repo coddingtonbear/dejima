@@ -30,9 +30,9 @@ Boox Annotations to Anki
     :alt: Supported implementations
     :target: https://pypi.org/project/boox-annotations-to-anki
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/coddingtonbear/boox-annotations-to-anki/v0.1.1.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/coddingtonbear/boox-annotations-to-anki/v1.0.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/coddingtonbear/boox-annotations-to-anki/compare/v0.1.1...master
+    :target: https://github.com/coddingtonbear/boox-annotations-to-anki/compare/v1.0.0...master
 
 .. end-badges
 
