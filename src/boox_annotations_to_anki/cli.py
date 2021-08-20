@@ -49,7 +49,7 @@ def main(argv=sys.argv):
     )
     arg_parser.add_argument(
         "--model-name",
-        default="Basic",
+        default="Basic (optional reversed card)",
         type=str,
         choices=api.get_model_names(),
     )
