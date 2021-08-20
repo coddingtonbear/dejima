@@ -73,6 +73,7 @@ setup(
         'requests>=2.26.0,<3.0',
         'boox-annotation-parser>=0.1,<1.0',
         'rich>=10.7.0,<11.0',
+        'appdirs>=1.4.4,<2.0',
     ],
     extras_require={
         # eg:

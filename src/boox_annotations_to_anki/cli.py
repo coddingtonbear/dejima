@@ -24,7 +24,8 @@ import sys
 from rich.console import Console
 from boox_annotation_parser import parser
 
-from .api import AnkiError, AnkiNote, AnkiNoteOptions, Connection
+from .db import Connection as DatabaseConnection
+from .api import escape, AnkiError, AnkiNote, Connection as AnkiConnection
 
 
 def calculate_foreign_key(note: parser.Annotation) -> str:
@@ -37,7 +38,9 @@ def calculate_foreign_key(note: parser.Annotation) -> str:
 
 
 def main(argv=sys.argv):
-    api = Connection()
+    db = DatabaseConnection()
+    api = AnkiConnection()
+
     console = Console()
 
     arg_parser = argparse.ArgumentParser()
@@ -47,11 +50,25 @@ def main(argv=sys.argv):
         choices=api.get_deck_names(),
     )
     arg_parser.add_argument(
-        '-m',
         '--model-name',
-        default="Foreign Import",
+        default="Basic",
         type=str,
         choices=api.get_model_names(),
+    )
+    arg_parser.add_argument(
+        '--original-text-field',
+        default="Front",
+        type=str
+    )
+    arg_parser.add_argument(
+        '--annotation-field',
+        default="Back",
+        type=str
+    )
+    arg_parser.add_argument(
+        '--reimport',
+        default=False,
+        action='store_true'
     )
     arg_parser.add_argument(
         '-i',
@@ -67,36 +84,114 @@ def main(argv=sys.argv):
     import_name = f'import{run_timestamp.strftime("%Y%m%dT%H%M%S")}'
 
     added = 0
+    merged = 0
+    invalid = 0
     total = 0
 
-    for annotation in parser.get_annotations(args.input).annotations:
-        total += 1
-        foreign_key = calculate_foreign_key(annotation)
+    annotation_info = parser.get_annotations(args.input)
+    for idx, annotation in enumerate(annotation_info.annotations):
+        try:
+            total += 1
+            foreign_key = calculate_foreign_key(annotation)
 
-        if not api.find_notes(
-            f'"ForeignKey:{foreign_key}"'
-        ):
-            new_note = AnkiNote(
-                args.deck_name,
-                args.model_name,
-                {
-                    "Front": annotation.original_text,
-                    "Back": annotation.annotations,
-                    "ForeignKey": foreign_key,
-                },
-                [import_name]
+            if not annotation.original_text:
+                console.print(
+                    "[yellow]Invalid note (missing 'original_text') "
+                    f"[bold]Item {idx}[/bold] "
+                    "[/yellow]"
+                )
+                invalid += 1
+                continue
+            elif not annotation.annotations:
+                console.print(
+                    "[yellow]Invalid note (missing 'annotations') "
+                    f"[bold]Item {idx}[/bold] "
+                    "[/yellow]"
+                )
+                invalid += 1
+                continue
+
+            if args.reimport or not db.annotation_is_known(foreign_key):
+                duplicates = api.find_notes(f"""
+                    deck:{escape(args.deck_name)}
+                    (
+                        {args.original_text_field}:{escape(annotation.original_text)}
+                        or
+                        {args.annotation_field}:{escape(annotation.annotations)}
+                    )
+                """)
+                if duplicates:
+                    if len(duplicates) > 1:
+                        raise ValueError(
+                            f"Multiple duplicate notes found! {duplicates}",
+                        )
+                    anki_id = duplicates[0]
+                    duplicate = api.get_note(anki_id)
+
+                    target_fields = {
+                        args.original_text_field: annotation.original_text,
+                        args.annotation_field: annotation.annotations,
+                    }
+                    modified_fields = []
+                    for k, v in target_fields.items():
+                        if duplicate.fields[k] != v:
+                            duplicate.fields[k] = (
+                                f"{duplicate.fields[k]}<hr />{v}"
+                            )
+                            modified_fields.append(k)
+
+                    duplicate.tags.append(import_name)
+                    api.update_note(anki_id, duplicate)
+                    db.mark_annotation_imported(
+                        foreign_key,
+                        anki_id,
+                        import_name
+                    )
+                    console.print(
+                        "[bright_green]Updated note "
+                        f"[bold]{anki_id}[/bold] "
+                        f"(fields changed: {','.join(modified_fields)})"
+                        "[/bright_green]"
+                    )
+                    merged += 1
+                else:
+                    new_note = AnkiNote(
+                        args.model_name,
+                        {
+                            args.original_text_field: annotation.original_text,
+                            args.annotation_field: annotation.annotations,
+                        },
+                        [
+                            'boox-import',
+                            import_name,
+                        ]
+                    )
+                    anki_id = api.add_note(args.deck_name, new_note)
+                    db.mark_annotation_imported(
+                        foreign_key,
+                        anki_id,
+                        import_name
+                    )
+                    added += 1
+                    console.print(
+                        "[green]Created note "
+                        f"[bold]{anki_id}[/bold]"
+                        "[/green]"
+                    )
+        except Exception:
+            console.print_exception(show_locals=True, word_wrap=True)
+            console.print(
+                f"[red]Added [bold]{added}[/bold] new records[/red] "
+                f"({merged} merged; {invalid} invalid; "
+                f"{total - added} already processed)"
             )
-            try:
-                api.add_note(new_note, AnkiNoteOptions(allowDuplicate=True))
-                added += 1
-            except AnkiError:
-                console.print_exception(show_locals=True)
-                return
-            except Exception:
-                console.print_exception(show_locals=True)
-                return
+            console.print(
+                f"[red][bold]Import \"{import_name}\" failed.[/bold][/red]"
+            )
+            sys.exit(1)
 
     console.print(
-        f"[green]Added [bold]{added}[/bold] new records[/green] "
-        f"({total - added} duplicates)"
+        f"[blue]Added [bold]{added}[/bold] new records[/blue] "
+        f"({merged} merged; {invalid} invalid; "
+        f"{total - added} already processed)"
     )

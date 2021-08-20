@@ -56,10 +56,6 @@ Requirements
 ============
 
 - AnkiConnect: https://ankiweb.net/shared/info/2055492159
-- Within Anki, you should have a "Note Type" named (by default, named "Foreign Import") having the following fields:
-  - ``Front``
-  - ``Back``
-  - ``ForeignKey``
 
 Documentation
 =============
