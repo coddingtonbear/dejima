@@ -17,24 +17,22 @@ Why does this file exist, and why not put this in __main__?
 import argparse
 import dataclasses
 import datetime
-from hashlib import sha256
 import json
 import sys
+from hashlib import sha256
 
-from rich.console import Console
 from boox_annotation_parser import parser
+from rich.console import Console
 
+from .api import AnkiNote
+from .api import Connection as AnkiConnection
+from .api import escape
 from .db import Connection as DatabaseConnection
-from .api import escape, AnkiError, AnkiNote, Connection as AnkiConnection
 
 
 def calculate_foreign_key(note: parser.Annotation) -> str:
-    data = json.dumps(
-        dataclasses.asdict(note),
-        sort_keys=True,
-        default=str
-    )
-    return sha256(data.encode('utf-8')).hexdigest()
+    data = json.dumps(dataclasses.asdict(note), sort_keys=True, default=str)
+    return sha256(data.encode("utf-8")).hexdigest()
 
 
 def main(argv=sys.argv):
@@ -45,38 +43,26 @@ def main(argv=sys.argv):
 
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument(
-        'deck_name',
+        "deck_name",
         type=str,
         choices=api.get_deck_names(),
     )
     arg_parser.add_argument(
-        '--model-name',
+        "--model-name",
         default="Basic",
         type=str,
         choices=api.get_model_names(),
     )
+    arg_parser.add_argument("--original-text-field", default="Front", type=str)
+    arg_parser.add_argument("--annotation-field", default="Back", type=str)
+    arg_parser.add_argument("--reimport", default=False, action="store_true")
     arg_parser.add_argument(
-        '--original-text-field',
-        default="Front",
-        type=str
-    )
-    arg_parser.add_argument(
-        '--annotation-field',
-        default="Back",
-        type=str
-    )
-    arg_parser.add_argument(
-        '--reimport',
-        default=False,
-        action='store_true'
-    )
-    arg_parser.add_argument(
-        '-i',
-        '--input',
-        nargs='?',
-        type=argparse.FileType('r'),
+        "-i",
+        "--input",
+        nargs="?",
+        type=argparse.FileType("r"),
         default=sys.stdin,
-        help='File to read from (default: stdin)'
+        help="File to read from (default: stdin)",
     )
     args = arg_parser.parse_args(argv[1:])
 
@@ -112,14 +98,16 @@ def main(argv=sys.argv):
                 continue
 
             if args.reimport or not db.annotation_is_known(foreign_key):
-                duplicates = api.find_notes(f"""
+                duplicates = api.find_notes(
+                    f"""
                     deck:{escape(args.deck_name)}
                     (
                         {args.original_text_field}:{escape(annotation.original_text)}
                         or
                         {args.annotation_field}:{escape(annotation.annotations)}
                     )
-                """)
+                """
+                )
                 if duplicates:
                     if len(duplicates) > 1:
                         raise ValueError(
@@ -135,18 +123,12 @@ def main(argv=sys.argv):
                     modified_fields = []
                     for k, v in target_fields.items():
                         if duplicate.fields[k] != v:
-                            duplicate.fields[k] = (
-                                f"{duplicate.fields[k]}<hr />{v}"
-                            )
+                            duplicate.fields[k] = f"{duplicate.fields[k]}<hr />{v}"
                             modified_fields.append(k)
 
                     duplicate.tags.append(import_name)
                     api.update_note(anki_id, duplicate)
-                    db.mark_annotation_imported(
-                        foreign_key,
-                        anki_id,
-                        import_name
-                    )
+                    db.mark_annotation_imported(foreign_key, anki_id, import_name)
                     console.print(
                         "[bright_green]Updated note "
                         f"[bold]{anki_id}[/bold] "
@@ -162,21 +144,15 @@ def main(argv=sys.argv):
                             args.annotation_field: annotation.annotations,
                         },
                         [
-                            'boox-import',
+                            "boox-import",
                             import_name,
-                        ]
+                        ],
                     )
                     anki_id = api.add_note(args.deck_name, new_note)
-                    db.mark_annotation_imported(
-                        foreign_key,
-                        anki_id,
-                        import_name
-                    )
+                    db.mark_annotation_imported(foreign_key, anki_id, import_name)
                     added += 1
                     console.print(
-                        "[green]Created note "
-                        f"[bold]{anki_id}[/bold]"
-                        "[/green]"
+                        "[green]Created note " f"[bold]{anki_id}[/bold]" "[/green]"
                     )
         except Exception:
             console.print_exception(show_locals=True, word_wrap=True)
@@ -185,9 +161,7 @@ def main(argv=sys.argv):
                 f"({merged} merged; {invalid} invalid; "
                 f"{total - added} already processed)"
             )
-            console.print(
-                f"[red][bold]Import \"{import_name}\" failed.[/bold][/red]"
-            )
+            console.print(f'[red][bold]Import "{import_name}" failed.[/bold][/red]')
             sys.exit(1)
 
     console.print(
