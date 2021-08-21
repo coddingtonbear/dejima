@@ -21,10 +21,10 @@ def read(*names, **kwargs):
 
 
 setup(
-    name="boox-annotations-to-anki",
+    name="dejima",
     version="1.0.1",
     license="MIT",
-    description="Create cards in Anki from your Onyx Boox annotations.",
+    description="Easily import data from a variety of formats into Anki.",
     long_description="%s\n%s"
     % (
         re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
@@ -34,7 +34,7 @@ setup(
     ),
     author="Adam Coddington",
     author_email="me@adamcoddington.net",
-    url="https://github.com/coddingtonbear/boox-annotations-to-anki",
+    url="https://github.com/coddingtonbear/dejima",
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(path))[0] for path in glob("src/*.py")],
@@ -64,8 +64,8 @@ setup(
         "Topic :: Utilities",
     ],
     project_urls={
-        "Changelog": "https://github.com/coddingtonbear/boox-annotations-to-anki/blob/master/CHANGELOG.rst",
-        "Issue Tracker": "https://github.com/coddingtonbear/boox-annotations-to-anki/issues",
+        "Changelog": "https://github.com/coddingtonbear/dejima/blob/master/CHANGELOG.rst",
+        "Issue Tracker": "https://github.com/coddingtonbear/dejima/issues",
     },
     keywords=[
         # eg: 'keyword1', 'keyword2', 'keyword3',
@@ -84,7 +84,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "boox-annotations-to-anki = boox_annotations_to_anki.cli:main",
+            "dejima = dejima.cli:main",
         ]
     },
 )

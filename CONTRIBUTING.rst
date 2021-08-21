@@ -8,7 +8,7 @@ little bit helps, and credit will always be given.
 Bug reports
 ===========
 
-When `reporting a bug <https://github.com/coddingtonbear/boox-annotations-to-anki/issues>`_ please include:
+When `reporting a bug <https://github.com/coddingtonbear/dejima/issues>`_ please include:
 
     * Your operating system name and version.
     * Any details about your local setup that might be helpful in troubleshooting.
@@ -17,14 +17,14 @@ When `reporting a bug <https://github.com/coddingtonbear/boox-annotations-to-ank
 Documentation improvements
 ==========================
 
-boox-annotations-to-anki could always use more documentation, whether as part of the
-official boox-annotations-to-anki docs, in docstrings, or even on the web in blog posts,
+dejima could always use more documentation, whether as part of the
+official dejima docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Feature requests and feedback
 =============================
 
-The best way to send feedback is to file an issue at https://github.com/coddingtonbear/boox-annotations-to-anki/issues.
+The best way to send feedback is to file an issue at https://github.com/coddingtonbear/dejima/issues.
 
 If you are proposing a feature:
 
@@ -35,13 +35,13 @@ If you are proposing a feature:
 Development
 ===========
 
-To set up `boox-annotations-to-anki` for local development:
+To set up `dejima` for local development:
 
-1. Fork `boox-annotations-to-anki <https://github.com/coddingtonbear/boox-annotations-to-anki>`_
+1. Fork `dejima <https://github.com/coddingtonbear/dejima>`_
    (look for the "Fork" button).
 2. Clone your fork locally::
 
-    git clone git@github.com:YOURGITHUBNAME/boox-annotations-to-anki.git
+    git clone git@github.com:YOURGITHUBNAME/dejima.git
 
 3. Create a branch for local development::
 

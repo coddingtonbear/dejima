@@ -14,25 +14,25 @@ Boox Annotations to Anki
       - | |version| |wheel| |supported-versions| |supported-implementations|
         | |commits-since|
 
-.. |version| image:: https://img.shields.io/pypi/v/boox-annotations-to-anki.svg
+.. |version| image:: https://img.shields.io/pypi/v/dejima.svg
     :alt: PyPI Package latest release
-    :target: https://pypi.org/project/boox-annotations-to-anki
+    :target: https://pypi.org/project/dejima
 
-.. |wheel| image:: https://img.shields.io/pypi/wheel/boox-annotations-to-anki.svg
+.. |wheel| image:: https://img.shields.io/pypi/wheel/dejima.svg
     :alt: PyPI Wheel
-    :target: https://pypi.org/project/boox-annotations-to-anki
+    :target: https://pypi.org/project/dejima
 
-.. |supported-versions| image:: https://img.shields.io/pypi/pyversions/boox-annotations-to-anki.svg
+.. |supported-versions| image:: https://img.shields.io/pypi/pyversions/dejima.svg
     :alt: Supported versions
-    :target: https://pypi.org/project/boox-annotations-to-anki
+    :target: https://pypi.org/project/dejima
 
-.. |supported-implementations| image:: https://img.shields.io/pypi/implementation/boox-annotations-to-anki.svg
+.. |supported-implementations| image:: https://img.shields.io/pypi/implementation/dejima.svg
     :alt: Supported implementations
-    :target: https://pypi.org/project/boox-annotations-to-anki
+    :target: https://pypi.org/project/dejima
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/coddingtonbear/boox-annotations-to-anki/v1.0.1.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/coddingtonbear/dejima/v1.0.1.svg
     :alt: Commits since latest release
-    :target: https://github.com/coddingtonbear/boox-annotations-to-anki/compare/v1.0.1...master
+    :target: https://github.com/coddingtonbear/dejima/compare/v1.0.1...master
 
 .. end-badges
 
@@ -45,11 +45,11 @@ Installation
 
 ::
 
-    pip install boox-annotations-to-anki
+    pip install dejima
 
 You can also install the in-development version with::
 
-    pip install https://github.com/coddingtonbear/boox-annotations-to-anki/archive/master.zip
+    pip install https://github.com/coddingtonbear/dejima/archive/master.zip
 
 
 Requirements
@@ -63,4 +63,4 @@ Documentation
 You can import your cards into Anki by running::
 
 
-    boox-annotations-to-anki MY_DECK_NAME --input=/path/to/boox/annotations.txt
+    dejima MY_DECK_NAME --input=/path/to/boox/annotations.txt
