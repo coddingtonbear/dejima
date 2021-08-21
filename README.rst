@@ -1,15 +1,12 @@
-========================
-Boox Annotations to Anki
-========================
+=============================================
+Dejima - A flexible content importer for Anki
+=============================================
 
 .. start-badges
 
 .. list-table::
     :stub-columns: 1
 
-    * - tests
-      - |
-        |
     * - package
       - | |version| |wheel| |supported-versions| |supported-implementations|
         | |commits-since|
