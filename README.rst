@@ -36,7 +36,7 @@ Boox Annotations to Anki
 
 .. end-badges
 
-Create cards in Anki from your Onyx Boox annotations.
+Create cards in Anki by importing data in a variety of formats.
 
 * Free software: MIT license
 
@@ -57,10 +57,14 @@ Requirements
 
 - AnkiConnect: https://ankiweb.net/shared/info/2055492159
 
+Supported Sources
+=================
+
+- ``boox``: Allows you to import reading annotations exported from an Onyx Boox e-reader or notepad.
+
 Documentation
 =============
 
 You can import your cards into Anki by running::
 
-
-    dejima MY_DECK_NAME --input=/path/to/boox/annotations.txt
+    dejima import MY_DECK_NAME SOURCE_NAME --input=/path/to/some/file.txt

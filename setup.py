@@ -85,6 +85,8 @@ setup(
     entry_points={
         "console_scripts": [
             "dejima = dejima.cli:main",
-        ]
+        ],
+        "dejima.sources": ["boox = dejima.sources.boox:BooxSource"],
+        "dejima.commands": ["import = dejima.commands.import:ImportCommand"],
     },
 )

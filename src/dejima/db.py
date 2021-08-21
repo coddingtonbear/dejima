@@ -1,13 +1,14 @@
 import datetime
 import os.path
 import sqlite3
+from typing import Optional
 
 from appdirs import user_data_dir
 
 from . import constants
 
 USER_DATA_DIR = user_data_dir(constants.APP_NAME, constants.AUTHOR_NAME)
-DB_PATH = os.path.join(USER_DATA_DIR, "annotations.db")
+DB_PATH = os.path.join(USER_DATA_DIR, "dejima.db")
 
 
 class Connection:
@@ -34,8 +35,9 @@ class Connection:
         cursor = self.get_cursor()
         cursor.execute(
             """
-            CREATE TABLE IF NOT EXISTS known_annotations (
+            CREATE TABLE IF NOT EXISTS known_entries (
                 key string,
+                source string,
                 anki_id integer,
                 importName string,
                 imported timestamp
@@ -44,28 +46,33 @@ class Connection:
         )
         cursor.close()
 
-    def mark_annotation_imported(self, key: str, anki_id: int, import_name: str):
+    def mark_entry_processed(
+        self, source: str, key: str, anki_id: Optional[int], import_name: str
+    ):
         cursor = self.get_cursor()
         cursor.execute(
             """
-            INSERT INTO known_annotations
-                (key, anki_id, imported, importName)
+            INSERT INTO known_entries
+                (key, source, anki_id, imported, importName)
             VALUES
-                (?, ?, ?, ?)
+                (?, ?, ?, ?, ?)
         """,
-            (key, anki_id, datetime.datetime.utcnow(), import_name),
+            (key, source, anki_id, datetime.datetime.utcnow(), import_name),
         )
         cursor.close()
 
-    def annotation_is_known(self, key: str) -> bool:
+    def annotation_is_known(self, source: str, key: str) -> bool:
         cursor = self.get_cursor()
         cursor.execute(
             """
             SELECT 1
-            FROM known_annotations
-            WHERE key = ?
+            FROM known_entries
+            WHERE key = ? AND source = ?
         """,
-            (key,),
+            (
+                key,
+                source,
+            ),
         )
 
         exists = len(cursor.fetchall()) > 0

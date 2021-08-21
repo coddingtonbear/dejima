@@ -8,6 +8,22 @@ import requests
 
 
 @dataclasses.dataclass
+class AnkiCardTemplate:
+    Name: str
+    Front: str
+    Back: str
+
+
+@dataclasses.dataclass
+class AnkiModel:
+    modelName: str
+    inOrderFields: List[str]
+    css: str
+    isCloze: bool
+    cardTemplates: List[AnkiCardTemplate]
+
+
+@dataclasses.dataclass
 class AnkiNoteOptions:
     allowDuplicate: bool = False
 
@@ -15,6 +31,7 @@ class AnkiNoteOptions:
 @dataclasses.dataclass
 class AnkiNote:
     modelName: str
+    deckName: str
     fields: Dict[str, str]
     tags: List[str]
 
@@ -53,15 +70,18 @@ class Connection:
         super().__init__()
 
     def _dispatch(self, action: str, params: Dict[str, Any] = None) -> Any:
+        payload = json.dumps(
+            {
+                "action": action,
+                "version": 6,
+                **({"params": params} if params is not None else {}),
+            },
+            indent=4,
+            sort_keys=True,
+        )
         request = self._connection.post(
             f"http://{self._hostname}:{self._port}/",
-            data=json.dumps(
-                {
-                    "action": action,
-                    "version": 6,
-                    **({"params": params} if params is not None else {}),
-                }
-            ),
+            data=payload,
         )
         request.raise_for_status()
 
@@ -78,14 +98,13 @@ class Connection:
     def get_model_names(self) -> List[str]:
         return self._dispatch("modelNames")
 
-    def add_note(
-        self, deck_name: str, note: AnkiNote, options: AnkiNoteOptions = None
-    ) -> int:
+    def create_model(self, model: AnkiModel) -> Dict:
+        return self._dispatch("createModel", dataclasses.asdict(model))
+
+    def add_note(self, note: AnkiNote, options: AnkiNoteOptions = None) -> int:
         note_data = dataclasses.asdict(note)
         if options is not None:
-            note_data["options"] = dataclasses.asdict(options)
-
-        note_data["deckName"] = deck_name
+            note_data.get("options", {}).update(dataclasses.asdict(options))
 
         return self._dispatch("addNote", {"note": note_data})
 
@@ -104,6 +123,7 @@ class Connection:
 
         return AnkiNote(
             modelName=result.get("modelName", ""),
+            deckName=result.get("deckName", ""),
             fields={k: v["value"] for k, v in result.get("fields", {}).items()},
             tags=result.get("tags", []),
         )
