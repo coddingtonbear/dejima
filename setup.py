@@ -22,7 +22,7 @@ def read(*names, **kwargs):
 
 setup(
     name="dejima",
-    version="1.0.1",
+    version="2.0.0",
     license="MIT",
     description="Easily import data from a variety of formats into Anki.",
     long_description="%s\n%s"
