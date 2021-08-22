@@ -9,58 +9,18 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
-from typing import TypeVar
 
-import pkg_resources
 from rich.console import Console
+from safdie import BaseCommand
+from safdie import get_entrypoints
 
-from .constants import ENTRYPOINT_PREFIX
+from .constants import SOURCE_ENTRYPOINT_NAME
 
 logger = logging.getLogger(__name__)
 
 
-def get_module_dotpath(o):
-    klass = o.__class__
-    module = klass.__module__
-    return module + "." + klass.__qualname__
-
-
-T = TypeVar("T")
-
-
-def _get_installed_plugins(entrypoint_suffix: str, cls: Type[T]) -> Dict[str, Type[T]]:
-    possible_commands: Dict[str, Type[T]] = {}
-    for entry_point in pkg_resources.iter_entry_points(
-        group=f"{ENTRYPOINT_PREFIX}.{entrypoint_suffix}"
-    ):
-        try:
-            loaded_class = entry_point.load()
-        except ImportError:
-            logger.warning(
-                "Attempted to load entrypoint %s, but an ImportError occurred.",
-                entry_point,
-            )
-            continue
-        if not issubclass(loaded_class, cls):
-            logger.warning(
-                "Loaded entrypoint %s, but loaded class is "
-                "not a subclass of `%s.%s`.",
-                entry_point,
-                cls.__module__,
-                cls.__qualname__,
-            )
-            continue
-        possible_commands[entry_point.name] = loaded_class
-
-    return possible_commands
-
-
-def get_installed_commands() -> Dict[str, Type[CommandPlugin]]:
-    return _get_installed_plugins("commands", CommandPlugin)
-
-
 def get_installed_sources() -> Dict[str, Type[SourcePlugin]]:
-    return _get_installed_plugins("sources", SourcePlugin)
+    return get_entrypoints(SOURCE_ENTRYPOINT_NAME, SourcePlugin)
 
 
 class NoteField:
@@ -223,34 +183,13 @@ class SourcePlugin(metaclass=_SourcePluginBase):
         return original
 
 
-class CommandPlugin:
-    _options: argparse.Namespace
+class CommandPlugin(BaseCommand):
     _console: Console
 
     def __init__(self, options: argparse.Namespace, console: Console):
         self._console: Console = console
-        self._options: argparse.Namespace = options
-        super().__init__()
+        super().__init__(options)
 
     @property
     def console(self) -> Console:
         return self._console
-
-    @property
-    def options(self) -> argparse.Namespace:
-        """Provides options provided at the command-line."""
-        return self._options
-
-    @classmethod
-    def get_help(cls) -> str:
-        """Retuurns help text for this function."""
-        return ""
-
-    @classmethod
-    def add_arguments(cls, parser: argparse.ArgumentParser) -> None:
-        """Allows adding additional command-line arguments."""
-        pass
-
-    def handle(self) -> None:
-        """This is where the work of your function starts."""
-        raise NotImplementedError()

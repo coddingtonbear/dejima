@@ -2,32 +2,24 @@ import argparse
 import sys
 
 from rich.console import Console
+from safdie import SafdieRunner
 
+from .constants import COMMAND_ENTRYPOINT_NAME
 from .exceptions import DejimaError
 from .exceptions import DejimaUserError
-from .plugin import get_installed_commands
+from .plugin import CommandPlugin
 
 
 def main(argv=sys.argv):
-    commands = get_installed_commands()
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--debugger", action="store_true")
+    runner = SafdieRunner(
+        COMMAND_ENTRYPOINT_NAME,
+        CommandPlugin,
+        parser=parser,
+    )
+    args = runner.parse_args(argv[1:])
 
-    subparsers = parser.add_subparsers(dest="command")
-    subparsers.required = True
-
-    for cmd_name, cmd_class in commands.items():
-        parser_kwargs = {}
-
-        cmd_help = cmd_class.get_help()
-        if cmd_help:
-            parser_kwargs["help"] = cmd_help
-
-        subparser = subparsers.add_parser(cmd_name, **parser_kwargs)
-        cmd_class.add_arguments(subparser)
-
-    args = parser.parse_args(argv[1:])
     console = Console()
 
     if args.debugger:
@@ -38,7 +30,12 @@ def main(argv=sys.argv):
         debugpy.wait_for_client()
 
     try:
-        commands[args.command](args, console).handle()
+        runner.run_command_for_parsed_args(
+            args,
+            init_kwargs={
+                "console": console,
+            },
+        )
     except DejimaError as e:
         console.print(f"[red]{e}[/red]")
     except DejimaUserError as e:
