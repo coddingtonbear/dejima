@@ -3,8 +3,18 @@ import json
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 
 import requests
+
+
+@dataclasses.dataclass
+class AnkiMediaUpload:
+    filename: str
+    data: Optional[str] = None  # Base64'd bytes
+    path: Optional[str] = None
+    url: Optional[str] = None
+    deleteExisting: bool = True
 
 
 @dataclasses.dataclass
@@ -134,3 +144,6 @@ class Connection:
             "findNotes",
             {"query": query},
         )
+
+    def store_media_file(self, media: AnkiMediaUpload) -> str:
+        return self._dispatch("storeMediaFile", dataclasses.asdict(media))

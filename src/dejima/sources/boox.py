@@ -35,13 +35,31 @@ class BooxSource(SourcePlugin):
         return [
             CardTemplate(
                 name="Card 1",
-                front="{{Front}}",
-                back="{{FrontSide}}\n\n<hr id='answer' />\n\n{{Back}}",
+                front="<p>{{Front}}</p>",
+                back="""
+                    {{FrontSide}}
+                    <hr id='answer' />
+                    <p>
+                        {{Back}}
+                    </p>
+                """,
             ),
             CardTemplate(
                 name="Card 2",
-                front="{{#Add Reverse}}{{Back}}{{/Add Reverse}}",
-                back="{{FrontSide}}\n\n<hr id='answer' />\n\n{{Front}}",
+                front="""
+                    {{#Add Reverse}}
+                        <p>
+                            {{Back}}
+                        </p>
+                    {{/Add Reverse}}
+                """,
+                back="""
+                    {{FrontSide}}
+                    <hr id='answer' />
+                    <p>
+                        {{Front}}
+                    </p>
+                """,
             ),
         ]
 

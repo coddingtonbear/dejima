@@ -1,10 +1,14 @@
 import argparse
+import base64
 import datetime
+from textwrap import dedent
 from typing import List
 
 from ..api import AnkiCardTemplate
+from ..api import AnkiMediaUpload
 from ..api import AnkiModel
 from ..api import AnkiNote
+from ..api import AnkiNoteOptions
 from ..api import Connection as AnkiConnection
 from ..api import escape
 from ..db import Connection as DatabaseConnection
@@ -58,9 +62,9 @@ class ImportCommand(CommandPlugin):
                 source.get_is_cloze(),
                 [
                     AnkiCardTemplate(
-                        Name=t.name,
-                        Front=t.front,
-                        Back=t.back,
+                        Name=dedent(t.name).strip(),
+                        Front=dedent(t.front).strip(),
+                        Back=dedent(t.back).strip(),
                     )
                     for t in source.get_card_templates()
                 ],
@@ -92,10 +96,7 @@ class ImportCommand(CommandPlugin):
                                 self.options.source, foreign_key, None, import_name
                             )
 
-                        if (
-                            field_info.default is not None
-                            and field_name not in entry.fields
-                        ):
+                        if field_info.default and field_name not in entry.fields:
                             entry.fields[field_name] = field_info.default
                     if not note_is_valid:
                         continue
@@ -107,14 +108,17 @@ class ImportCommand(CommandPlugin):
                             )
                             pass
 
-                    duplicates = api.find_notes(
-                        f"""
-                        deck:{escape(self.options.deck_name)}
-                        (
-                            {' or '.join(clauses)}
+                    duplicates = []
+                    if clauses:
+                        duplicates = api.find_notes(
+                            f"""
+                            deck:{escape(self.options.deck_name)}
+                            (
+                                {' or '.join(clauses)}
+                            )
+                        """
                         )
-                    """
-                    )
+
                     if duplicates:
                         if len(duplicates) > 1:
                             self.console.print(
@@ -155,7 +159,9 @@ class ImportCommand(CommandPlugin):
                                 import_name,
                             ],
                         )
-                        anki_id = api.add_note(new_note)
+                        anki_id = api.add_note(
+                            new_note, AnkiNoteOptions(allowDuplicate=True)
+                        )
                         db.mark_entry_processed(
                             self.options.source, foreign_key, anki_id, import_name
                         )
@@ -163,6 +169,19 @@ class ImportCommand(CommandPlugin):
                         self.console.print(
                             "[green]Created note " f"[bold]{anki_id}[/bold]" "[/green]"
                         )
+
+                    # We can upload the media regardless of whether
+                    # this element turns out to be a duplicate --
+                    # Anki will search for and find unreferenced media
+                    # automatically.
+                    for media in entry.media:
+                        api.store_media_file(
+                            AnkiMediaUpload(
+                                filename=media.filename,
+                                data=base64.b64encode(media.data).decode("ascii"),
+                            )
+                        )
+
             except Exception:
                 self.console.print(
                     f"[red]Added [bold]{added}[/bold] new records[/red] "

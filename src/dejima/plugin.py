@@ -75,7 +75,7 @@ class NoteField:
         self,
         field_name: Optional[str] = None,
         unique: bool = False,
-        default: Optional[str] = None,
+        default: str = "",
         merge: bool = False,
         optional: bool = False,
     ):
@@ -125,9 +125,16 @@ class CardTemplate:
 
 
 @dataclasses.dataclass
+class Media:
+    filename: str
+    data: bytes
+
+
+@dataclasses.dataclass
 class Note:
     fields: Dict[str, str] = dataclasses.field(default_factory=dict)
     tags: List[str] = dataclasses.field(default_factory=list)
+    media: List[Media] = dataclasses.field(default_factory=list)
 
 
 class _SourcePluginBase(type):

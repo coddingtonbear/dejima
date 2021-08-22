@@ -73,7 +73,8 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "requests>=2.26.0,<3.0",
-        "boox-annotation-parser>=0.1,<1.0",
+        "boox-annotation-parser>=0.1.1,<1.0",
+        "lln-json-parser>=0.1.1,<1.0",
         "rich>=10.7.0,<11.0",
         "appdirs>=1.4.4,<2.0",
     ],
@@ -86,7 +87,10 @@ setup(
         "console_scripts": [
             "dejima = dejima.cli:main",
         ],
-        "dejima.sources": ["boox = dejima.sources.boox:BooxSource"],
+        "dejima.sources": [
+            "boox = dejima.sources.boox:BooxSource",
+            "lln-json = dejima.sources.lln:LLNJsonSource",
+        ],
         "dejima.commands": ["import = dejima.commands.import:ImportCommand"],
     },
 )
