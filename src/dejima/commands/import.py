@@ -79,8 +79,10 @@ class ImportCommand(CommandPlugin):
         for idx, (foreign_key, entry) in enumerate(source.get_entries()):
             try:
                 total += 1
-                if self.options.reimport or not db.annotation_is_known(
-                    self.options.source, foreign_key
+                if (
+                    not foreign_key
+                    or self.options.reimport
+                    or not db.annotation_is_known(self.options.source, foreign_key)
                 ):
                     note_is_valid = True
                     for field_name, field_info in source.fields.items():
@@ -92,9 +94,10 @@ class ImportCommand(CommandPlugin):
                             )
                             invalid += 1
                             note_is_valid = False
-                            db.mark_entry_processed(
-                                self.options.source, foreign_key, None, import_name
-                            )
+                            if foreign_key:
+                                db.mark_entry_processed(
+                                    self.options.source, foreign_key, None, import_name
+                                )
 
                         if field_info.default and field_name not in entry.fields:
                             entry.fields[field_name] = field_info.default
@@ -140,9 +143,10 @@ class ImportCommand(CommandPlugin):
                         duplicate_anki.tags = anki_note.tags
 
                         api.update_note(anki_id, duplicate_anki)
-                        db.mark_entry_processed(
-                            self.options.source, foreign_key, anki_id, import_name
-                        )
+                        if foreign_key:
+                            db.mark_entry_processed(
+                                self.options.source, foreign_key, anki_id, import_name
+                            )
                         self.console.print(
                             "[bright_green]Updated note "
                             f"[bold]{anki_id}[/bold][/bright_green]"
@@ -162,9 +166,10 @@ class ImportCommand(CommandPlugin):
                         anki_id = api.add_note(
                             new_note, AnkiNoteOptions(allowDuplicate=True)
                         )
-                        db.mark_entry_processed(
-                            self.options.source, foreign_key, anki_id, import_name
-                        )
+                        if foreign_key:
+                            db.mark_entry_processed(
+                                self.options.source, foreign_key, anki_id, import_name
+                            )
                         added += 1
                         self.console.print(
                             "[green]Created note " f"[bold]{anki_id}[/bold]" "[/green]"

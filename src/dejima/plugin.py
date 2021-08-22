@@ -204,7 +204,7 @@ class SourcePlugin(metaclass=_SourcePluginBase):
     def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         pass
 
-    def get_entries(self) -> Iterable[Tuple[str, Note]]:
+    def get_entries(self) -> Iterable[Tuple[Optional[str], Note]]:
         raise NotImplementedError()
 
     def resolve_duplicate(self, original: Note, new: Note) -> Note:
