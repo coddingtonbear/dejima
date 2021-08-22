@@ -25,12 +25,12 @@ setup(
     version="2.0.1",
     license="MIT",
     description="Easily import data from a variety of formats into Anki.",
-    long_description="%s\n%s"
+    long_description_content_type="text/markdown",
+    long_description="%s"
     % (
         re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
-            "", read("README.rst")
-        ),
-        re.sub(":[a-z]+:`~?(.*?)`", r"``\1``", read("CHANGELOG.rst")),
+            "", read("README.md")
+        )
     ),
     author="Adam Coddington",
     author_email="me@adamcoddington.net",
@@ -64,7 +64,6 @@ setup(
         "Topic :: Utilities",
     ],
     project_urls={
-        "Changelog": "https://github.com/coddingtonbear/dejima/blob/master/CHANGELOG.rst",
         "Issue Tracker": "https://github.com/coddingtonbear/dejima/issues",
     },
     keywords=[
