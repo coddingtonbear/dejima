@@ -72,8 +72,8 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "requests>=2.26.0,<3.0",
-        "boox-annotation-parser>=0.1.1,<1.0",
-        "lln-json-parser>=0.1.1,<1.0",
+        "boox-annotation-parser>=0.1.2,<1.0",
+        "lln-json-parser>=0.1.3,<1.0",
         "rich>=10.7.0,<11.0",
         "appdirs>=1.4.4,<2.0",
         "safdie>=1.0.0,<2.0.0",
