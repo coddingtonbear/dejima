@@ -76,7 +76,7 @@ setup(
         "lln-json-parser>=0.1.3,<1.0",
         "rich>=10.7.0,<11.0",
         "appdirs>=1.4.4,<2.0",
-        "safdie>=1.0.0,<2.0.0",
+        "safdie>=2.0.0,<3.0",
     ],
     extras_require={
         # eg:
