@@ -3,11 +3,11 @@ import os.path
 import sqlite3
 from typing import Optional
 
-from appdirs import user_data_dir
+import appdirs
 
 from . import constants
 
-USER_DATA_DIR = user_data_dir(constants.APP_NAME, constants.AUTHOR_NAME)
+USER_DATA_DIR = appdirs.user_data_dir(constants.APP_NAME, constants.AUTHOR_NAME)
 DB_PATH = os.path.join(USER_DATA_DIR, "dejima.db")
 
 
